@@ -221,6 +221,9 @@ DEFAULT_REQUEST_LIMIT = 8
 MAXIMUM_INCREASE_DURATION = 5.0
 MAXIMUM_HOLD_DURATION = 12.0
 
+AUTH_FAILED_MESSAGE = ('Authentication Failed: Incorrect credentials or '
+                       'unsupported authentication type (e.g. OpenId).')
+
 
 def ImportStateMessage(state):
   """Converts a numeric state identifier to a status message."""
@@ -2761,7 +2764,7 @@ class Loader(object):
     uploaded entities. The value returned should be None (to use a
     server generated numeric key), or a string which neither starts
     with a digit nor has the form __*__ (see
-    http://code.google.com/appengine/docs/python/datastore/keysandentitygroups.html),
+    https://developers.google.com/appengine/docs/python/datastore/entities),
     or a datastore.Key instance.
 
     If you generate your own string keys, keep in mind:
@@ -3263,6 +3266,7 @@ class QueueJoinThread(threading.Thread):
       queue: The queue for this thread to join.
     """
     threading.Thread.__init__(self)
+    self.setDaemon(True)
     assert isinstance(queue, (Queue.Queue, ReQueue))
     self.queue = queue
 
@@ -4235,7 +4239,7 @@ def _PerformBulkload(arg_dict,
       try:
         return_code = app.Run()
       except AuthenticationError:
-        logger.info('Authentication Failed')
+        logger.error(AUTH_FAILED_MESSAGE)
     finally:
       loader.finalize()
   elif download or dump or create_config:
@@ -4269,7 +4273,7 @@ def _PerformBulkload(arg_dict,
       try:
         return_code = app.Run()
       except AuthenticationError:
-        logger.info('Authentication Failed')
+        logger.error(AUTH_FAILED_MESSAGE)
       except KindStatError:
         logger.error('Unable to download kind stats for all-kinds download.')
         logger.error('Kind stats are generated periodically by the appserver')
@@ -4304,7 +4308,7 @@ def _PerformBulkload(arg_dict,
       try:
         return_code = app.Run()
       except AuthenticationError:
-        logger.info('Authentication Failed')
+        logger.error(AUTH_FAILED_MESSAGE)
     finally:
       mapper.finalize()
   return return_code

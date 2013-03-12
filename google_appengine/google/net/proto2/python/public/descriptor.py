@@ -28,7 +28,10 @@ from google.net.proto2.python.internal import api_implementation
 
 
 if api_implementation.Type() == 'cpp':
-  from google.net.proto2.python.internal import cpp_message
+  if api_implementation.Version() == 2:
+    from google.net.proto2.python.internal.cpp import _message
+  else:
+    from google.net.proto2.python.internal import cpp_message
 
 
 class Error(Exception):
@@ -58,6 +61,18 @@ class DescriptorBase(object):
     """Initialize the descriptor given its options message and the name of the
     class of the options message. The name of the class is required in case
     the options message is None and has to be created.
+    """
+    self._options = options
+    self._options_class_name = options_class_name
+
+
+    self.has_options = options is not None
+
+  def _SetOptions(self, options, options_class_name):
+    """Sets the descriptor's options
+
+    This function is used in generated proto2 files to update descriptor
+    options. It must not be used outside proto2.
     """
     self._options = options
     self._options_class_name = options_class_name
@@ -374,12 +389,20 @@ class FieldDescriptor(DescriptorBase):
       TYPE_FLOAT: CPPTYPE_FLOAT,
       TYPE_ENUM: CPPTYPE_ENUM,
       TYPE_INT64: CPPTYPE_INT64,
+      TYPE_SINT64: CPPTYPE_INT64,
+      TYPE_SFIXED64: CPPTYPE_INT64,
       TYPE_UINT64: CPPTYPE_UINT64,
+      TYPE_FIXED64: CPPTYPE_UINT64,
       TYPE_INT32: CPPTYPE_INT32,
+      TYPE_SFIXED32: CPPTYPE_INT32,
+      TYPE_SINT32: CPPTYPE_INT32,
       TYPE_UINT32: CPPTYPE_UINT32,
+      TYPE_FIXED32: CPPTYPE_UINT32,
+      TYPE_BYTES: CPPTYPE_STRING,
       TYPE_STRING: CPPTYPE_STRING,
       TYPE_BOOL: CPPTYPE_BOOL,
-      TYPE_MESSAGE: CPPTYPE_MESSAGE
+      TYPE_MESSAGE: CPPTYPE_MESSAGE,
+      TYPE_GROUP: CPPTYPE_MESSAGE
       }
 
 
@@ -390,6 +413,12 @@ class FieldDescriptor(DescriptorBase):
   LABEL_REQUIRED      = 2
   LABEL_REPEATED      = 3
   MAX_LABEL           = 3
+
+
+
+  MAX_FIELD_NUMBER = (1 << 29) - 1
+  FIRST_RESERVED_FIELD_NUMBER = 19000
+  LAST_RESERVED_FIELD_NUMBER = 19999
 
   def __init__(self, name, full_name, index, number, type, cpp_type, label,
                default_value, message_type, enum_type, containing_type,
@@ -419,9 +448,15 @@ class FieldDescriptor(DescriptorBase):
     self.extension_scope = extension_scope
     if api_implementation.Type() == 'cpp':
       if is_extension:
-        self._cdescriptor = cpp_message.GetExtensionDescriptor(full_name)
+        if api_implementation.Version() == 2:
+          self._cdescriptor = _message.GetExtensionDescriptor(full_name)
+        else:
+          self._cdescriptor = cpp_message.GetExtensionDescriptor(full_name)
       else:
-        self._cdescriptor = cpp_message.GetFieldDescriptor(full_name)
+        if api_implementation.Version() == 2:
+          self._cdescriptor = _message.GetFieldDescriptor(full_name)
+        else:
+          self._cdescriptor = cpp_message.GetFieldDescriptor(full_name)
     else:
       self._cdescriptor = None
 
@@ -605,13 +640,22 @@ class MethodDescriptor(DescriptorBase):
 class FileDescriptor(DescriptorBase):
   """Descriptor for a file. Mimics the descriptor_pb2.FileDescriptorProto.
 
+  Note that enum_types_by_name, extensions_by_name, and dependencies
+  fields are only set by the message_factory module, and not by the
+  generated proto code.
+
   name: name of file, relative to root of source tree.
   package: name of the package
   serialized_pb: (str) Byte string of serialized
     descriptor_pb2.FileDescriptorProto.
+  dependencies: List of other files this file depends on.
+  messages: List of Descriptors for messages in this file.
+  enum_types_by_name: Dict of enum names and their descriptors.
+  extensions_by_name: Dict of extension names and their descriptors.
   """
 
-  def __init__(self, name, package, options=None, serialized_pb=None):
+  def __init__(self, name, package, options=None, serialized_pb=None,
+               dependencies=None):
     """Constructor."""
     super(FileDescriptor, self).__init__(options, 'FileOptions')
 
@@ -619,9 +663,17 @@ class FileDescriptor(DescriptorBase):
     self.name = name
     self.package = package
     self.serialized_pb = serialized_pb
+
+    self.enum_types_by_name = {}
+    self.extensions_by_name = {}
+    self.dependencies = (dependencies or [])
+
     if (api_implementation.Type() == 'cpp' and
         self.serialized_pb is not None):
-      cpp_message.BuildFile(self.serialized_pb)
+      if api_implementation.Version() == 2:
+        _message.BuildFile(self.serialized_pb)
+      else:
+        cpp_message.BuildFile(self.serialized_pb)
 
   def CopyToProto(self, proto):
     """Copies this to a descriptor_pb2.FileDescriptorProto.

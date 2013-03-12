@@ -1042,13 +1042,15 @@ class Entity(dict):
     return pb
 
   @staticmethod
-  def FromPb(pb, validate_reserved_properties=True):
+  def FromPb(pb, validate_reserved_properties=True,
+             default_kind='<not specified>'):
     """Static factory method. Returns the Entity representation of the
     given protocol buffer (datastore_pb.Entity).
 
     Args:
       pb: datastore_pb.Entity or str encoding of a datastore_pb.Entity
       validate_reserved_properties: deprecated
+      default_kind: str, the kind to use if the pb has no key.
 
     Returns:
       Entity: the Entity representation of pb
@@ -1056,14 +1058,14 @@ class Entity(dict):
 
     if isinstance(pb, str):
       real_pb = entity_pb.EntityProto()
-      real_pb.ParseFromString(pb)
+      real_pb.ParsePartialFromString(pb)
       pb = real_pb
 
     return Entity._FromPb(
-        pb, require_valid_key=False)
+        pb, require_valid_key=False, default_kind=default_kind)
 
   @staticmethod
-  def _FromPb(pb, require_valid_key=True):
+  def _FromPb(pb, require_valid_key=True, default_kind='<not specified>'):
     """Static factory method. Returns the Entity representation of the
     given protocol buffer (datastore_pb.Entity). Not intended to be used by
     application developers.
@@ -1074,13 +1076,15 @@ class Entity(dict):
     Args:
       # a protocol buffer Entity
       pb: datastore_pb.Entity
+      default_kind: str, the kind to use if the pb has no key.
 
     Returns:
       # the Entity representation of the argument
       Entity
     """
 
-    assert pb.key().path().element_size() > 0
+    if not pb.key().path().element_size():
+      pb.mutable_key().CopyFrom(Key.from_path(default_kind, 0)._ToPb())
 
     last_path = pb.key().path().element_list()[-1]
     if require_valid_key:
@@ -1092,14 +1096,15 @@ class Entity(dict):
         assert last_path.name()
 
 
-    unindexed_properties = [p.name() for p in pb.raw_property_list()]
+    unindexed_properties = [unicode(p.name(), 'utf-8')
+                            for p in pb.raw_property_list()]
 
 
     if pb.key().has_name_space():
       namespace = pb.key().name_space()
     else:
       namespace = ''
-    e = Entity(unicode(last_path.type().decode('utf-8')),
+    e = Entity(unicode(last_path.type(), 'utf-8'),
                unindexed_properties=unindexed_properties,
                _app=pb.key().app(), namespace=namespace)
     ref = e.__key._Key__reference
@@ -1138,7 +1143,7 @@ class Entity(dict):
 
 
     for name, value in temporary_values.iteritems():
-      decoded_name = unicode(name.decode('utf-8'))
+      decoded_name = unicode(name, 'utf-8')
 
 
 
@@ -1252,6 +1257,8 @@ class Query(dict):
   __namespace = None
   __orderings = None
   __ancestor_pb = None
+  __distinct = False
+  __group_by = None
 
   __index_list_source = None
   __cursor_source = None
@@ -1269,7 +1276,7 @@ class Query(dict):
 
   def __init__(self, kind=None, filters={}, _app=None, keys_only=False,
                compile=True, cursor=None, namespace=None, end_cursor=None,
-               projection=None, _namespace=None):
+               projection=None, distinct=None, _namespace=None):
     """Constructor.
 
     Raises BadArgumentError if kind is not a string. Raises BadValueError or
@@ -1281,6 +1288,7 @@ class Query(dict):
       filters: dict, initial set of filters.
       keys_only: boolean, if keys should be returned instead of entities.
       projection: iterable of property names to project.
+      distinct: boolean, if projection should be distinct.
       compile: boolean, if the query should generate cursors.
       cursor: datastore_query.Cursor, the start cursor to use.
       end_cursor: datastore_query.Cursor, the end cursor to use.
@@ -1312,12 +1320,20 @@ class Query(dict):
     self.__app = datastore_types.ResolveAppId(_app)
     self.__namespace = datastore_types.ResolveNamespace(namespace)
 
+
     self.__query_options = datastore_query.QueryOptions(
         keys_only=keys_only,
         produce_cursors=compile,
         start_cursor=cursor,
         end_cursor=end_cursor,
         projection=projection)
+
+    if distinct:
+      if not self.__query_options.projection:
+        raise datastore_errors.BadQueryError(
+            'cannot specify distinct without a projection')
+      self.__distinct = True
+      self.__group_by = self.__query_options.projection
 
   def Order(self, *orderings):
     """Specify how the query results should be sorted.
@@ -1483,7 +1499,8 @@ class Query(dict):
                                  kind=self.__kind,
                                  ancestor=self.__ancestor_pb,
                                  filter_predicate=self.GetFilterPredicate(),
-                                 order=self.GetOrder())
+                                 order=self.GetOrder(),
+                                 group_by=self.__group_by)
 
   def GetOrder(self):
     """Gets a datastore_query.Order for the current instance.
@@ -1533,6 +1550,14 @@ class Query(dict):
           datastore_query.CompositeFilter.AND,
           property_filters)
     return None
+
+  def GetDistinct(self):
+    """Returns True if the current instance is distinct.
+
+    Returns:
+      A boolean indicating if the distinct flag is set.
+    """
+    return self.__distinct
 
   def GetIndexList(self):
     """Get the index list from the last run of this query.
@@ -1592,7 +1617,15 @@ class Query(dict):
     """
 
 
+
     query_options = self.GetQueryOptions().merge(config)
+    if self.__distinct and query_options.projection != self.__group_by:
+
+
+
+
+      raise datastore_errors.BadArgumentError(
+          'cannot override projection when distinct is set')
     return self.GetQuery().run(_GetConnection(), query_options)
 
   def Run(self, **kwargs):
@@ -2194,6 +2227,15 @@ class MultiQuery(Query):
       results.append(bound_query.Run(config=config))
       count += 1
 
+    def GetDedupeKey(sort_order_entity):
+      if projection:
+
+        return (sort_order_entity.GetEntity().key(),
+
+               frozenset(sort_order_entity.GetEntity().iteritems()))
+      else:
+        return sort_order_entity.GetEntity().key()
+
     def IterateResults(results):
       """Iterator function to return all results in sorted order.
 
@@ -2227,14 +2269,7 @@ class MultiQuery(Query):
 
           break
         top_result = heapq.heappop(result_heap)
-        if projection:
-
-          dedupe_key = (top_result.GetEntity().key(),
-
-                        frozenset(top_result.GetEntity().iteritems()))
-        else:
-          dedupe_key = top_result.GetEntity().key()
-
+        dedupe_key = GetDedupeKey(top_result)
         if dedupe_key not in used_keys:
           result = top_result.GetEntity()
           if override:
@@ -2253,7 +2288,7 @@ class MultiQuery(Query):
         results_to_push = []
         while result_heap:
           next = heapq.heappop(result_heap)
-          if cmp(top_result, next):
+          if dedupe_key != GetDedupeKey(next):
 
             results_to_push.append(next)
             break

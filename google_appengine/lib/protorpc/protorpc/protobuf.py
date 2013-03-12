@@ -40,12 +40,15 @@ from . import messages
 from google.net.proto import ProtocolBuffer
 
 
-__all__ = ['CONTENT_TYPE',
+__all__ = ['ALTERNATIVE_CONTENT_TYPES',
+           'CONTENT_TYPE',
            'encode_message',
            'decode_message',
           ]
 
-CONTENT_TYPE = 'application/x-google-protobuf'
+CONTENT_TYPE = 'application/octet-stream'
+
+ALTERNATIVE_CONTENT_TYPES = ['application/x-google-protobuf']
 
 
 class _Encoder(ProtocolBuffer.Encoder):
@@ -297,7 +300,10 @@ def decode_message(message_type, encoded_message):
 
       # Special case Enum and Message types.
       if isinstance(field, messages.EnumField):
-        value = field.type(value)
+        try:
+          value = field.type(value)
+        except TypeError:
+          raise messages.DecodeError('Invalid enum value %s' % value)
       elif isinstance(field, messages.MessageField):
         nested_message = decode_message(field.type, value)
         value = nested_message

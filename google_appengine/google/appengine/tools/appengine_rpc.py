@@ -24,12 +24,15 @@
 import google
 
 import cookielib
+import cStringIO
 import fancy_urllib
+import gzip
 import logging
 import os
 import re
 import socket
 import sys
+import time
 import urllib
 import urllib2
 
@@ -91,20 +94,29 @@ class ClientLoginError(urllib2.HTTPError):
   def __init__(self, url, code, msg, headers, args):
     urllib2.HTTPError.__init__(self, url, code, msg, headers, None)
     self.args = args
-    self.reason = args["Error"]
+    self._reason = args.get("Error")
     self.info = args.get("Info")
 
   def read(self):
     return '%d %s: %s' % (self.code, self.msg, self.reason)
 
 
+
+  @property
+  def reason(self):
+    return self._reason
+
+
 class AbstractRpcServer(object):
   """Provides a common interface for a simple RPC server."""
+
+
+  SUGGEST_OAUTH2 = False
 
   def __init__(self, host, auth_function, user_agent, source,
                host_override=None, extra_headers=None, save_cookies=False,
                auth_tries=3, account_type=None, debug_data=True, secure=True,
-               rpc_tries=3):
+               ignore_certs=False, rpc_tries=3):
     """Creates a new HttpRpcServer.
 
     Args:
@@ -125,6 +137,7 @@ class AbstractRpcServer(object):
       account_type: One of GOOGLE, HOSTED_OR_GOOGLE, or None for automatic.
       debug_data: Whether debugging output should include data contents.
       secure: If the requests sent using Send should be sent over HTTPS.
+      ignore_certs: If the certificate mismatches should be ignored.
       rpc_tries: The number of rpc retries upon http server error (i.e.
         Response code >= 500 and < 600) before failing.
     """
@@ -132,6 +145,7 @@ class AbstractRpcServer(object):
       self.scheme = "https"
     else:
       self.scheme = "http"
+    self.ignore_certs = ignore_certs
     self.host = host
     self.host_override = host_override
     self.auth_function = auth_function
@@ -155,9 +169,9 @@ class AbstractRpcServer(object):
     self.cookie_jar = cookielib.MozillaCookieJar()
     self.opener = self._GetOpener()
     if self.host_override:
-      logger.info("Server: %s; Host: %s", self.host, self.host_override)
+      logger.debug("Server: %s; Host: %s", self.host, self.host_override)
     else:
-      logger.info("Server: %s", self.host)
+      logger.debug("Server: %s", self.host)
 
 
     if ((self.host_override and self.host_override == "localhost") or
@@ -213,8 +227,10 @@ class AbstractRpcServer(object):
         "accountType": account_type
     }
 
+
     req = self._CreateRequest(
-        url="https://www.google.com/accounts/ClientLogin",
+        url=("https://%s/accounts/ClientLogin" %
+             os.getenv("APPENGINE_AUTH_SERVER", "www.google.com")),
         data=urllib.urlencode(data))
     try:
       response = self.opener.open(req)
@@ -288,6 +304,14 @@ class AbstractRpcServer(object):
                                  "of your regular account password.")
             print >>sys.stderr, ("See http://www.google.com/"
                                  "support/accounts/bin/answer.py?answer=185833")
+
+
+
+            if self.SUGGEST_OAUTH2:
+              print >>sys.stderr, ("However, now the recommended way to log in "
+                                   "is using OAuth2. See")
+              print >>sys.stderr, ("https://developers.google.com/appengine/"
+                                   "docs/python/tools/uploadinganapp#oauth")
           else:
             print >>sys.stderr, "Invalid username or password."
           continue
@@ -352,13 +376,16 @@ class AbstractRpcServer(object):
         tries += 1
         url = "%s://%s%s" % (self.scheme, self.host, request_path)
         if kwargs:
-          url += "?" + urllib.urlencode(kwargs)
+
+
+          url += "?" + urllib.urlencode(sorted(kwargs.items()))
         req = self._CreateRequest(url=url, data=payload)
         req.add_header("Content-Type", content_type)
 
 
 
         req.add_header("X-appcfg-api-version", "1")
+
         try:
           logger.debug('Sending %s request:\n%s',
                        self.scheme.upper(),
@@ -366,6 +393,7 @@ class AbstractRpcServer(object):
           f = self.opener.open(req)
           response = f.read()
           f.close()
+
           return response
         except urllib2.HTTPError, e:
           logger.debug("Got http error, this is try #%s", tries)
@@ -405,6 +433,77 @@ class AbstractRpcServer(object):
       socket.setdefaulttimeout(old_timeout)
 
 
+class ContentEncodingHandler(urllib2.BaseHandler):
+  """Request and handle HTTP Content-Encoding."""
+  def http_request(self, request):
+
+    request.add_header("Accept-Encoding", "gzip")
+
+
+
+
+
+
+
+
+
+
+
+
+    for header in request.headers:
+      if header.lower() == "user-agent":
+        request.headers[header] += " gzip"
+
+    return request
+
+  https_request = http_request
+
+  def http_response(self, req, resp):
+    """Handle encodings in the order that they are encountered."""
+    encodings = []
+    headers = resp.headers
+
+    for header in headers:
+      if header.lower() == "content-encoding":
+        for encoding in headers.get(header, "").split(","):
+          encoding = encoding.strip()
+          if encoding:
+            encodings.append(encoding)
+        break
+
+    if not encodings:
+      return resp
+
+    del headers[header]
+
+    fp = resp
+    while encodings and encodings[-1].lower() == "gzip":
+      fp = cStringIO.StringIO(fp.read())
+      fp = gzip.GzipFile(fileobj=fp, mode="r")
+      encodings.pop()
+
+    if encodings:
+
+
+
+
+      headers[header] = ", ".join(encodings)
+      logger.warning("Unrecognized Content-Encoding: %s", encodings[-1])
+
+    msg = resp.msg
+    if sys.version_info >= (2, 6):
+      resp = urllib2.addinfourl(fp, headers, resp.url, resp.code)
+    else:
+      response_code = resp.code
+      resp = urllib2.addinfourl(fp, headers, resp.url)
+      resp.code = response_code
+    resp.msg = msg
+
+    return resp
+
+  https_response = http_response
+
+
 class HttpRpcServer(AbstractRpcServer):
   """Provides a simplified RPC-style interface for HTTP requests."""
 
@@ -414,7 +513,8 @@ class HttpRpcServer(AbstractRpcServer):
     self.certpath = os.path.normpath(os.path.join(
         os.path.dirname(__file__), '..', '..', '..', 'lib', 'cacerts',
         'cacerts.txt'))
-    self.cert_file_available = os.path.exists(self.certpath)
+    self.cert_file_available = ((not kwargs.get("ignore_certs", False))
+                                and os.path.exists(self.certpath))
     super(HttpRpcServer, self).__init__(*args, **kwargs)
 
   def _CreateRequest(self, url, data=None):
@@ -423,6 +523,17 @@ class HttpRpcServer(AbstractRpcServer):
     if self.cert_file_available and fancy_urllib.can_validate_certs():
       req.set_ssl_info(ca_certs=self.certpath)
     return req
+
+  def _CheckCookie(self):
+    """Warn if cookie is not valid for at least one minute."""
+    min_expire = time.time() + 60
+
+    for cookie in self.cookie_jar:
+      if cookie.domain == self.host and not cookie.is_expired(min_expire):
+        break
+    else:
+      print >>sys.stderr, "\nError: Machine system clock is incorrect.\n"
+
 
   def _Authenticate(self):
     """Save the cookie jar after authentication."""
@@ -433,12 +544,13 @@ class HttpRpcServer(AbstractRpcServer):
 Without the ssl module, the identity of the remote host cannot be verified, and
 connections may NOT be secure. To fix this, please install the ssl module from
 http://pypi.python.org/pypi/ssl .
-To learn more, see http://code.google.com/appengine/kb/general.html#rpcssl .""")
+To learn more, see https://developers.google.com/appengine/kb/general#rpcssl""")
     super(HttpRpcServer, self)._Authenticate()
     if self.cookie_jar.filename is not None and self.save_cookies:
-      logger.info("Saving authentication cookies to %s",
-                  self.cookie_jar.filename)
+      logger.debug("Saving authentication cookies to %s",
+                   self.cookie_jar.filename)
       self.cookie_jar.save()
+      self._CheckCookie()
 
   def _GetOpener(self):
     """Returns an OpenerDirector that supports cookies and ignores redirects.
@@ -453,6 +565,7 @@ To learn more, see http://code.google.com/appengine/kb/general.html#rpcssl .""")
     opener.add_handler(urllib2.HTTPDefaultErrorHandler())
     opener.add_handler(fancy_urllib.FancyHTTPSHandler())
     opener.add_handler(urllib2.HTTPErrorProcessor())
+    opener.add_handler(ContentEncodingHandler())
 
     if self.save_cookies:
       self.cookie_jar.filename = os.path.expanduser(
@@ -462,8 +575,8 @@ To learn more, see http://code.google.com/appengine/kb/general.html#rpcssl .""")
         try:
           self.cookie_jar.load()
           self.authenticated = True
-          logger.info("Loaded authentication cookies from %s",
-                      self.cookie_jar.filename)
+          logger.debug("Loaded authentication cookies from %s",
+                       self.cookie_jar.filename)
         except (OSError, IOError, cookielib.LoadError), e:
 
           logger.debug("Could not load authentication cookies; %s: %s",
@@ -483,3 +596,13 @@ To learn more, see http://code.google.com/appengine/kb/general.html#rpcssl .""")
 
     opener.add_handler(urllib2.HTTPCookieProcessor(self.cookie_jar))
     return opener
+
+
+
+class HttpRpcServerWithOAuth2Suggestion(HttpRpcServer):
+  """An HttpRpcServer variant which suggests using OAuth2 instead of ASP.
+
+  Not all systems which use HttpRpcServer can use OAuth2.
+  """
+
+  SUGGEST_OAUTH2 = True
