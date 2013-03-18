@@ -1,0 +1,7 @@
+#.gitignore file
+#
+
+VS2012 Modern Image Library/
+
+*.pyc
+
