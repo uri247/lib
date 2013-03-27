@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7B6FFBDC-D172-47B7-B0A3-52A3B5F91EDD}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>MiniClientVB.My.MyApplication</StartupObject>
+    <RootNamespace>MiniClientVB</RootNamespace>
+    <AssemblyName>MiniClientVB</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>MiniClientVB.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>MiniClientVB.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Matrix">
+      <HintPath>..\..\..\bin\Matrix.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DiscoNode.vb" />
+    <Compile Include="FrmChat.Designer.vb">
+      <DependentUpon>FrmChat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmChat.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGroupChat.designer.vb">
+      <DependentUpon>FrmGroupChat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGroupChat.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmInputBox.Designer.vb">
+      <DependentUpon>FrmInputBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmInputBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmMain.Designer.vb">
+      <DependentUpon>FrmMain.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmMain.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPubSub.Designer.vb">
+      <DependentUpon>FrmPubSub.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmPubSub.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmReceiveFile.Designer.vb">
+      <DependentUpon>FrmReceiveFile.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmReceiveFile.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSendFile.Designer.vb">
+      <DependentUpon>FrmSendFile.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmSendFile.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmVCard.Designer.vb">
+      <DependentUpon>FrmVCard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrmVCard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InputDialog.Designer.vb">
+      <DependentUpon>InputDialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="InputDialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Program.vb" />
+    <Compile Include="RosterListViewItem.vb" />
+    <Compile Include="Settings\Login.vb" />
+    <Compile Include="Settings\Settings.vb" />
+    <Compile Include="Util.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FrmChat.resx">
+      <DependentUpon>FrmChat.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGroupChat.resx">
+      <DependentUpon>FrmGroupChat.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmInputBox.resx">
+      <DependentUpon>FrmInputBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmMain.resx">
+      <DependentUpon>FrmMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmPubSub.resx">
+      <DependentUpon>FrmPubSub.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmReceiveFile.resx">
+      <DependentUpon>FrmReceiveFile.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSendFile.resx">
+      <DependentUpon>FrmSendFile.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmVCard.resx">
+      <DependentUpon>FrmVCard.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputDialog.resx">
+      <DependentUpon>InputDialog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
