@@ -1,0 +1,27 @@
+﻿<Window x:Class="WindowsLiveMessenger.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        Title="Windows Live Messenger example" Height="350" Width="525">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" >
+            <Button Height="30" Width="100" x:Name="btnSignIn" Content="Sign in" Click="btnSignIn_Click" />
+            <Button Height="30" Width="100" x:Name="btnSignOut" Content="Sign out" IsEnabled="False" Click="btnSignOut_Click" />
+        </StackPanel>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Debug Xml">
+                <ScrollViewer x:Name="scrollRtf" Grid.Row="1">
+                    <RichTextBox x:Name="rtfDebug"/>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Events">
+                <ListBox x:Name="listEvents"/>
+            </TabItem>
+        </TabControl>
+        
+    </Grid>
+</Window>

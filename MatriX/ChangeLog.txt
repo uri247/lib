@@ -1,0 +1,145 @@
+﻿Version 1.3.0.0
+===============
+- moved RosterManager to Matrix.Xmpp.Client namespace
+- added Data Property to OwnerQuery
+- added presence filter property to XmppClient
+- optimized MessageFilter for multithreading
+- optimized PresenceFilter for multithreading
+- added xmpp bookarks
+- added private storage
+- added Clone member to Jid for fast cloning
+- added SASL EXTERNAL
+- added PubsubManager.RequestNodeConfiguration
+- added PubsubManager.SubmitNodeConfiguration
+- added PubSubAffiliations
+- added file tranfer (IBB, SI...)
+- added Xpath filtering
+- added ad hoc commands
+- added bookmarks
+- added chatstates
+- added roster versioning
+- updated compression to new namespace in stream features
+- added XHtml-IM support
+- optimized iq filter to handle only type error and result
+
+Version 1.3.1.0
+===============
+- added SCRAM-SHA-1 SASL mechanism
+- fixed MLink shutdown problem
+- added XMPP Pings
+- XmppClient does automatically replay to Pings when AutoReplyToPing is true
+- added handled propery to IqEventArgs
+- reuse IqEventArgs object in the IqFilter now and set Handled to true when the callback is raised.
+- not-allowed error parsing was missing
+- added xml:lang to XmppXElement
+- added XEP-0115: Entity Capabilities
+- added XEP-0202: Entity Time
+- added classes for XEP-0198 Stream Managment
+- added OnBeginSasl event to XmppClient for manual selecting a SASL mechanism in a client
+- optimized xml parser and got rid of the time consuming PartialTokenExceptions
+- added Facebook's X-FACEBOOK-PLATFORM Sasl mechanism
+- Tls for Mobile version is using Bouncy Castle Crypto now
+
+Version 1.4.0.0
+===============
+- small fix in disco
+- fixed problem when no weight is given for SRV records
+- added DIGEST-MD5 to Silverlight and WP7 version
+- added OnBeforeSendPresence event to modify outgoing presences with custom content.
+- added auth stream feature (XEP-0078)
+- added non SASL authentication
+- fixed XElement.ToString() for Windows Phone
+- added XEP-0033 extended stanza addressing
+- optimized BOSH for WP7 and latest Openfire
+- added cdata
+- updated Silverlight version for Sl4
+- added ability in Silverlight to download policy over HTTP (new feature in SL4)
+- try to connect to all hosts in the srv records (full .NET version only)
+- Added Remove account to XmppClient
+
+Version 1.5.0.0
+===============
+- threading bugfix in OnBeforeSasl
+- added privacy lists (XEP-0016)
+- added PrivacyIq
+- added Privacymanager
+- added XPathFiler for Silverlight version
+- added more overloads to EnterRoom in Mucmanager
+- added BOSH prebind in full version
+- added OnCreateWebRequest event to XmppStream where you can pass additonal Webrequest stuff for BOSH conections.
+- added approved attribute to roter items, new feature of RFC6121
+- added XEP-0055 Jabber Search
+- updated for Facebooks OAUTH authentication
+- added XEP-0184 Message Delivery Receipts
+- fixed MD5 hashing bug (http://archive.msdn.microsoft.com/SilverlightMD5)
+- added OnCreateBoshSession event for overwriting Bosh default session request params
+- added XEP-0224 user attention
+- extended DisoManager, can now automatically reply to info requests, and build the Caps hash. new  methods: AddFeature, RemoveFeature, AddIdentity, Removeidentity, BuildCapsHash, new properties: AutoReplyToDiscoInfo   
+- added BookMarkStorageIq
+- conplete rewrite and resdesign of the BOSH component (BoshSocket)
+- complete rewrite of the BOSH component
+- fixed bug in caps hashes
+- added File Dictionary
+- added storage providers for file and memory
+- DiscoManager can now automatically send and request caps
+- Discomanager can cache caps to file or memory
+- added OnStreamHeader event to allow client and internal components to access the stream header
+- added caps to presence
+- added on BindError
+- added all Html-Im elements definded in the XEP
+- added change password to xmppclient
+- added geolocation
+- added Jingle classes
+- added XMucUser Property to Message class
+- added see-other-host error class
+
+Version 1.5.3.0 (in progress, all listed features are in the latest binaries)
+===============
+- added NTLM SASL authentication
+- added XEP-0066: Out of Band Data
+- added generic IqQuery<T> classes for easier creating of IQ queries for client, server and components
+- Added SubmitRoomConfiguration to MucManager
+- Added destroy function to MucManager
+- Added DeclineInvite to MucManager
+- Added DeclineInvite event to MucManager
+- Added more overloads to MucManager.ChangeAffiliation
+- Added ResultSetmanagement XEP-0059
+- Added recursive Element search to XmppXElement
+- Added GetJid class for Windows Live Messenger Jid lookups
+- Added more overloads to RosterManager for callbacks
+- Added RetrieveSubscriptionsList to PubSubManager
+- Added old legacy SSL for client connections
+- Added ModifyList to MucManager
+- replaced spaces by dashes in the default resource string because some xmpp server have problems with resources that contain spaces
+- improvements to the socket code in the WinRT version
+- added Google XOAuth2 SASL mechanism for OAuth2 authentication with Google
+- more WinRT optimisations
+- added compiled lambda for type generation
+- added TypeGeneration selection to Factory
+- aded ContainsRosterItem function to Roster
+- added RemoveRosterItem function to Roster
+- added OnDeny event to FileTransferManager
+- check ProxyHostname also for IP-address in resolver
+- XmppClient.Send does not throw Exception anymore, it raises the OnError event now instead.
+- added last activity XEP-0012
+- added XOob XEP-0066: Out of Band Data
+- added GetEnumerator to FileStorage and MemoryStorage
+- added Values to FileStorage and MemoryStorage
+- added Keys to FileStorage and MemoryStorage
+- added Blocksize Property to FileTransferManager
+- added ControlChannelTrigger to WinRT version
+- 64bit fix in DNS API resolver (srv records)
+- added Received property to Message class
+- added ReceiptRequested property to Message class
+- added XEP-0144 roster item exchange
+- added OnRosterExchange event to RosterManager
+- fix in XML parser that caused a loop when receiving partial entities in an attribute
+- added XEP-0092: Software Version
+- added RequestAllSubscriptions to PubSubManager
+- added RequestSubscriptions to PubSubManager
+- added a Unsubscribe overload to the PubSubManager which allows to pass a subid
+- added Text property to  Matrix.Xmpp.Sasl.Failure
+- started to add fluent APIs to XmppXElement, Up, Text, AddTag, SetAttribute
+- added XData property to Search for easier access to XData forms
+- renamed Data to XData in Register class
+- fixed a cross thread exception for Windows Phone in the keep alive timer

@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A1ACA151-B330-481E-AF79-681CF53E9E4A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MiniClient</RootNamespace>
+    <AssemblyName>MiniClient</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Matrix">
+      <HintPath>..\..\..\bin\Matrix.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FrmChat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmChat.Designer.cs">
+      <DependentUpon>FrmChat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmGroupChat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmGroupChat.designer.cs">
+      <DependentUpon>FrmGroupChat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmInputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmInputBox.Designer.cs">
+      <DependentUpon>FrmInputBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmReceiveFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmReceiveFile.designer.cs">
+      <DependentUpon>FrmReceiveFile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmSendFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmSendFile.Designer.cs">
+      <DependentUpon>FrmSendFile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmPubSub.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmPubSub.Designer.cs">
+      <DependentUpon>FrmPubSub.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmMain.Designer.cs">
+      <DependentUpon>FrmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DiscoNode.cs" />
+    <Compile Include="FrmVCard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmVCard.Designer.cs">
+      <DependentUpon>FrmVCard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InputDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InputDialog.Designer.cs">
+      <DependentUpon>InputDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FrmChat.resx">
+      <DependentUpon>FrmChat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmGroupChat.resx">
+      <DependentUpon>FrmGroupChat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmInputBox.resx">
+      <DependentUpon>FrmInputBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmReceiveFile.resx">
+      <DependentUpon>FrmReceiveFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmSendFile.resx">
+      <DependentUpon>FrmSendFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmPubSub.resx">
+      <DependentUpon>FrmPubSub.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmMain.resx">
+      <DependentUpon>FrmMain.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmVCard.resx">
+      <DependentUpon>FrmVCard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InputDialog.resx">
+      <DependentUpon>InputDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="RosterListViewItem.cs" />
+    <Compile Include="Settings\Login.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Util.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

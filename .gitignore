@@ -1,5 +1,7 @@
-#.gitignore file
+
+google_appengine/
+VS2012 Modern Image Library/
 
 *.pyc
-google_appengine/
+
 
