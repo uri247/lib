@@ -512,7 +512,7 @@ if __name__ == '__main__':
                 record.params['wsgi.multithread'] = False
                 record.params['wsgi.run_once'] = False
 
-                physical_path = record.params.get('DOCUMENT_ROOT', path.dirname(__file__))
+                physical_path = record.params.get('APPL_PHYSICAL_PATH', path.dirname(__file__))
                 
                 errors = sys.stderr = sys.__stderr__ = record.params['wsgi.errors'] = cStringIO.StringIO()
                 output = sys.stdout = sys.__stdout__ = cStringIO.StringIO()
