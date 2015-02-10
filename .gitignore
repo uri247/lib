@@ -1,6 +1,7 @@
 
 google_appengine/
 VS2012 Modern Image Library/
+flex_sdk_3.4/
 
 
 *.pyc
