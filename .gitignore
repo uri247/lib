@@ -5,6 +5,8 @@ flex_sdk_3.4/
 StandaloneSDK/
 android-sdk/
 Android/sdk
+cmake-3.12.1-win64-x64/
+hibernate-release-5.3.1.Final/
 
 
 *.pyc
